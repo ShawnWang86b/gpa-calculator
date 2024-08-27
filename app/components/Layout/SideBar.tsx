@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import SideBarItem from "@/app/components/SideBarItem";
 
 type Props = {
   className?: string;
@@ -12,7 +13,10 @@ const SideBar = ({ className }: Props) => {
         className
       )}
     >
-      SideBar
+      <SideBarItem />
+      <SideBarItem />
+      <SideBarItem />
+      <SideBarItem />
     </div>
   );
 };

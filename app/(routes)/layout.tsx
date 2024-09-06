@@ -13,7 +13,7 @@ const DashboardLayout = ({ children }: Props) => {
       <Header />
       <div className="flex h-full">
         <MobileHeader />
-        <SideBar className="hidden 2xl:flex" />
+        {/* <SideBar className="hidden 2xl:flex" /> */}
         <section className="flex h-full 2xl:pl-[120px]">{children}</section>
       </div>
       <Footer />

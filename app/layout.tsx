@@ -20,6 +20,7 @@ export default function RootLayout({
       appearance={{
         baseTheme: [neobrutalism],
       }}
+      afterSignOutUrl="/"
     >
       <html lang="en">
         <body className={inter.className}>{children}</body>

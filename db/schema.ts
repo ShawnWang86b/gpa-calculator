@@ -4,49 +4,68 @@ import {
   serial,
   text,
   integer,
-  boolean,
-  date,
-  decimal,
-  jsonb,
+  timestamp,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 
-// Categories table
-export const categories = pgTable("categories", {
+// Users table
+export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  clerkId: text("clerkId").notNull(),
+  firstName: text("firstName").notNull(),
+  lastName: text("lastName").notNull(),
+  photo: text("photo").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// Stickers table
-export const stickers = pgTable("stickers", {
+// Semesters table
+export const semesters = pgTable("semesters", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description"),
-  price: decimal("price").notNull(),
-  category_id: integer("category_id")
-    .references(() => categories.id)
-    .notNull(),
-  images: jsonb("images").notNull(),
-  in_stock: boolean("in_stock").notNull().default(true),
+  semesterName: text("semester_name").notNull(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id), // Foreign key
 });
 
-// Orders table
-export const orders = pgTable("orders", {
+// Courses table
+export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
-  sticker_id: integer("sticker_id")
-    .references(() => stickers.id)
-    .notNull(),
-  quantity: integer("quantity").notNull(),
-  total_price: decimal("total_price").notNull(),
-  order_date: date("order_date").notNull().default("CURRENT_TIMESTAMP"),
-  customer_name: text("customer_name").notNull(),
-  customer_email: text("customer_email").notNull(),
+  courseName: text("course_name").notNull(),
+  semesterId: integer("semester_id")
+    .notNull()
+    .references(() => semesters.id), // Foreign key
 });
 
-// Shopping Cart table
-export const shoppingCart = pgTable("shopping_cart", {
+// Assignments table
+export const assignments = pgTable("assignments", {
   id: serial("id").primaryKey(),
-  customer_id: integer("customer_id").notNull(),
-  items: jsonb("items").notNull(), // Array of sticker ids and quantities
-  created_at: date("created_at").notNull().default("CURRENT_TIMESTAMP"),
-  updated_at: date("updated_at").notNull().default("CURRENT_TIMESTAMP"),
+  assignmentName: text("assignment_name").notNull(),
+  weight: integer("weight").notNull(),
+  fullMark: integer("full_mark").default(0),
+  scored: integer("scored").default(0),
+  courseId: integer("course_id")
+    .notNull()
+    .references(() => courses.id), // Foreign key
 });
+
+// Define relationships
+export const usersRelations = relations(users, ({ many }) => ({
+  semesters: many(semesters),
+}));
+
+export const semestersRelations = relations(semesters, ({ many, one }) => ({
+  user: one(users),
+  courses: many(courses),
+}));
+
+export const coursesRelations = relations(courses, ({ many, one }) => ({
+  semester: one(semesters),
+  assignments: many(assignments),
+}));
+
+export const assignmentsRelations = relations(assignments, ({ one }) => ({
+  course: one(courses),
+}));

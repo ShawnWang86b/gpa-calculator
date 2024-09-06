@@ -1,9 +1,45 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { LoaderPinwheel } from "lucide-react";
+import {
+  ClerkLoaded,
+  ClerkLoading,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/nextjs";
 
 const Header = () => {
   return (
-    <header className="bg-sky-600 text-white pt-12 2xl:pl-[120px] flex justify-end">
-      user profile
+    <header className="h-20 w-full border-b-2 border-slate-200 px-4">
+      <div className="lg:max-w-screen-lg mx-auto flex items-center justify-between h-full">
+        <div className="pt-8 pl-4 pb-7 flex items-center gap-x-3 cursor-pointer">
+          <Image src="/logo.png" height={40} width={40} alt="drizzle_logo" />
+          <h1 className="text-2xl font-extrabold text-[#a4c3eb] tracking-wide">
+            drizzle
+          </h1>
+        </div>
+        <ClerkLoading>
+          <LoaderPinwheel className="h-5 w-5 animate-spin text-[#a4c3eb]" />
+        </ClerkLoading>
+        <ClerkLoaded>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton
+              mode="modal"
+              forceRedirectUrl="/learning"
+              signUpForceRedirectUrl="/learning"
+            >
+              <Button variant="login" size="lg">
+                Login
+              </Button>
+            </SignInButton>
+          </SignedOut>
+        </ClerkLoaded>
+      </div>
     </header>
   );
 };

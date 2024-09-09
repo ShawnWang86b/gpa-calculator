@@ -9,34 +9,34 @@ import {
 } from "drizzle-orm/pg-core";
 
 // Users table
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  clerkId: text("clerkId").notNull(),
-  firstName: text("firstName").notNull(),
-  lastName: text("lastName").notNull(),
-  photo: text("photo").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+// export const users = pgTable("users", {
+//   id: serial("id").primaryKey(),
+//   name: text("name").notNull(),
+//   email: text("email").notNull(),
+//   clerkId: text("clerkId").notNull(),
+//   firstName: text("firstName").notNull(),
+//   lastName: text("lastName").notNull(),
+//   photo: text("photo").notNull(),
+//   createdAt: timestamp("created_at").notNull().defaultNow(),
+//   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+// });
 
 // Semesters table
 export const semesters = pgTable("semesters", {
   id: serial("id").primaryKey(),
   semesterName: text("semester_name").notNull(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => users.id), // Foreign key
+  userId: text("user_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // Courses table
 export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   courseName: text("course_name").notNull(),
+  passingLine: integer("passing_line").notNull(),
   semesterId: integer("semester_id")
     .notNull()
-    .references(() => semesters.id), // Foreign key
+    .references(() => semesters.id, { onDelete: "cascade" }), // Foreign key
 });
 
 // Assignments table
@@ -48,16 +48,12 @@ export const assignments = pgTable("assignments", {
   scored: integer("scored").default(0),
   courseId: integer("course_id")
     .notNull()
-    .references(() => courses.id), // Foreign key
+    .references(() => courses.id, { onDelete: "cascade" }), // Foreign key
 });
 
 // Define relationships
-export const usersRelations = relations(users, ({ many }) => ({
-  semesters: many(semesters),
-}));
 
-export const semestersRelations = relations(semesters, ({ many, one }) => ({
-  user: one(users),
+export const semestersRelations = relations(semesters, ({ many }) => ({
   courses: many(courses),
 }));
 

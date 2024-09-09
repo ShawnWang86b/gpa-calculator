@@ -34,7 +34,7 @@ export const createCourse = async (courseInfo: {
     .returning();
 
   revalidatePath("/courses");
-  redirect("/courses");
+  //   redirect("/courses");
 };
 // Get all semesters
 export const getCourses = cache(async (semester_id: number) => {

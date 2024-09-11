@@ -12,11 +12,11 @@ export const List = ({ semesters }: Props) => {
   return (
     <div className="pt-6 grid grid-cols-3 gap-4">
       {semesters.map((semester: any) => (
-        <Link href={`/learning/${semester.id}`} key={semester.id}>
-          <div>
-            <SemesterCard semesterName={semester.semesterName} />
-          </div>
-        </Link>
+        // <Link href={`/learning/${semester.id}`} key={semester.id}>
+        <div>
+          <SemesterCard semesterName={semester.semesterName} />
+        </div>
+        // </Link>
       ))}
     </div>
   );

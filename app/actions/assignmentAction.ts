@@ -40,3 +40,22 @@ export const createAssignment = async (assignmentInfo: {
   revalidatePath("/courses");
   //   redirect("/courses");
 };
+
+// Get all Assignment
+export const getAssignment = cache(async (semester_id: number) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!semester_id) {
+    throw new Error("No semester created");
+  }
+
+  const data = await db.query.courses.findMany({
+    where: eq(courses.semesterId, semester_id),
+  });
+
+  return data;
+});

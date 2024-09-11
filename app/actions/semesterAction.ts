@@ -43,3 +43,15 @@ export const getSemesters = cache(async () => {
 
   return data;
 });
+
+// Delete a semester
+// FIXME: will change semester_id from num to string
+export const deleteSemester = async (semester_id: number) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  await db.delete(semesters).where(eq(semesters.id, semester_id));
+};

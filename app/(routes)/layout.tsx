@@ -15,9 +15,8 @@ const DashboardLayout = ({ children }: Props) => {
         <MobileHeader />
         {/* <SideBar className="hidden 2xl:flex" /> */}
         {/* <section className="flex h-full 2xl:pl-[120px]">{children}</section> */}
-        <section className="flex h-full max-w-screen-xl mx-auto">
-          {children}
-        </section>
+        {/* max-w-screen-xl */}
+        <section className="flex h-full  mx-auto">{children}</section>
       </div>
       <Footer />
     </main>

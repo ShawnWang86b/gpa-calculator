@@ -32,10 +32,8 @@ export const createCourse = async (courseInfo: {
       semesterId,
     })
     .returning();
-
-  revalidatePath("/courses");
-  //   redirect("/courses");
 };
+
 // Get all semesters
 export const getCourses = cache(async (semester_id: number) => {
   const { userId } = await auth();

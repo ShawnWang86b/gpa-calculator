@@ -4,16 +4,18 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FolderPlus } from "lucide-react";
+import { ArrowBigLeftDash, Plus } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import { createCourse } from "@/app/actions/courseAction";
+import Link from "next/link";
+import Image from "next/image";
 
 type CourseInfo = {
   courseName: string;
@@ -55,48 +57,55 @@ const CreateCourse = ({ semesterId }: Props) => {
     }));
   };
   return (
-    <div className="flex mt-4 ml-2 mr-2.5 justify-between items-center">
-      <p className="font-bold text-lg">courses List</p>
+    <div className="flex mt-4 ml-2 mr-2.5 gap-5 items-center">
+      <Link href="/learning">
+        <Button variant="primary">
+          <ArrowBigLeftDash className="w-6 h-6 mr-2" /> <p>BACK</p>
+        </Button>
+      </Link>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button
-            variant="login"
-            className="border-2 border-black hover:border-[#a4c3eb]"
-          >
-            <FolderPlus className="w-6 h-6 mr-2" /> <p>Create</p>
+          <Button variant="secondary">
+            <Plus className="w-6 h-6 mr-2" /> <p>NEW</p>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Create new course</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                placeholder="Enter subject name"
-                className="col-span-3"
-                onChange={handleCourseNameChange}
-              />
-            </div>
+            <DialogDescription>
+              <div className="flex flex-col items-center gap-5">
+                <Image
+                  src="/create_confirm.png"
+                  height={60}
+                  width={60}
+                  alt="planets"
+                  className="group-hover:animate-spin"
+                />
+                <p className="text-black font-semibold">
+                  You can name a new semester card
+                </p>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Score
-              </Label>
-              <Input
-                id="score"
-                placeholder="Enter passing score"
-                className="col-span-3"
-                onChange={handlePassingLineChange}
-              />
-            </div>
-          </div>
+                <Input
+                  id="name"
+                  placeholder="Subject, Machine Learning ..."
+                  className="focus:border-1 focus:border-leaf"
+                  onChange={handleCourseNameChange}
+                />
+
+                <Input
+                  id="score"
+                  placeholder="Passing score, e.g. 50"
+                  className="focus:border-1 focus:border-leaf"
+                  onChange={handlePassingLineChange}
+                />
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmit}>
+            <Button variant="ghost" onClick={() => setIsOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="secondary" onClick={handleSubmit}>
               Create
             </Button>
           </DialogFooter>

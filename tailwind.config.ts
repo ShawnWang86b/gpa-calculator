@@ -52,6 +52,22 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        info: {
+          DEFAULT: "#3399da",
+          light: "#a4c3eb",
+        },
+        leaf: {
+          DEFAULT: "#6cc4ab",
+          light: "#9ad6c3",
+        },
+        fire: {
+          DEFAULT: "#bf352b",
+          light: "#bc544c",
+        },
+        gem: {
+          DEFAULT: "#8f6bcf",
+          light: "#bdafdf",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

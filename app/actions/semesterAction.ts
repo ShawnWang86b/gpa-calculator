@@ -54,4 +54,23 @@ export const deleteSemester = async (semester_id: number) => {
   }
 
   await db.delete(semesters).where(eq(semesters.id, semester_id));
+  revalidatePath("/learning");
+};
+
+// Update the semester info
+export const updateSemester = async (
+  semester_id: number,
+  updatedSemesterName: string
+) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  await db
+    .update(semesters)
+    .set({ semesterName: updatedSemesterName })
+    .where(eq(semesters.id, semester_id));
+  revalidatePath("/learning");
 };

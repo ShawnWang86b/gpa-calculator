@@ -23,7 +23,9 @@ const Header = () => {
             </h1>
           </div>
         </Link>
-        <Link href="/learning">Dashboard</Link>
+        <Link href="/learning">
+          <Button variant="primary">Dashboard</Button>
+        </Link>
 
         <ClerkLoading>
           <LoaderPinwheel className="h-5 w-5 animate-spin text-[#a4c3eb]" />
@@ -38,7 +40,7 @@ const Header = () => {
               forceRedirectUrl="/learning"
               signUpForceRedirectUrl="/learning"
             >
-              <Button variant="login" size="lg">
+              <Button variant="ghost" size="lg">
                 Login
               </Button>
             </SignInButton>

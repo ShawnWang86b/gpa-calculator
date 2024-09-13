@@ -10,20 +10,42 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteSemester, updateSemester } from "@/app/actions/semesterAction";
-import Link from "next/link";
+import useStore from "@/app/store/useStore";
+import { cn } from "@/lib/utils";
+import dayjs from "dayjs";
 
 type Props = {
   semesterId: string;
   semesterName: string;
+  createdAt: Date;
 };
 
-const SemesterCard = ({ semesterId, semesterName }: Props) => {
+const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [newSemesterName, setNewSemesterName] = useState(semesterName);
+  const selectedSemesterId = useStore((state) => state.setSelectedSemesterId);
+  const currentSemesterId = useStore((state) => state.selectedSemesterId);
+
+  // here is for refresh tab's content
+  const setCurrentValue = useStore((state) => state.setCurrentValue);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    if (currentSemesterId === semesterId) {
+      setIsActive(true);
+    } else {
+      setIsActive(false);
+    }
+  }, [currentSemesterId, semesterId]);
+
+  const handleStoreSemesterId = () => {
+    setCurrentValue(0);
+    selectedSemesterId(semesterId);
+  };
 
   const handleEdit = () => {
     updateSemester(Number(semesterId), newSemesterName);
@@ -36,27 +58,29 @@ const SemesterCard = ({ semesterId, semesterName }: Props) => {
   };
 
   return (
-    <div className="flex-col justify-center items-center border-2 border-[black] w-full h-[160px] bg-slate-200 p-4 m-2 rounded-lg cursor-pointer hover:bg-slate-300 group">
+    <div
+      className={cn(
+        "flex-col justify-center items-center border-[1px] border-info/30 p-3 bg-muted w-full h-[150px] m-2 min-w-[300px]",
+        isActive ? "bg-info-light" : "bg-white"
+      )}
+    >
       <div className="flex justify-between items-center">
-        <div>
-          <Image
-            src="/planets/planet03.png"
-            height={40}
-            width={40}
-            alt="planets"
-            className="group-hover:animate-spin"
-          />
+        <div className="font-semibold">{semesterName}</div>
+        <div className="ml-auto text-xs text-foreground">
+          {dayjs(createdAt).format("MMM D, YYYY")}
         </div>
-        <div>{semesterName}</div>
       </div>
-      <div className="flex-1 h-[1px] bg-slate-500 my-5" />
-      <div className="flex justify-end gap-5">
-        <Link href={`/learning/${semesterId}`}>
-          <Button variant="primary">
-            <Eye className="h-5 w-5 mr-2" />
-            <p>CHECK</p>
-          </Button>
-        </Link>
+      <div className="line-clamp-2 text-xs text-muted-foreground">
+        Hi, lets have a meeting tomorrow to discuss the project. Ive been
+        reviewing the project details and have some ideas Id like to shar
+      </div>
+      {/* <div className="flex-1 h-[1px] bg-slate-500 my-5" /> */}
+      <div className="flex justify-end gap-5 mt-5 min-w-[200px]">
+        <Button variant="primary" onClick={handleStoreSemesterId}>
+          <Eye className="h-5 w-5 mr-2" />
+          <p>CHECK</p>
+        </Button>
+
         <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
           <DialogTrigger asChild>
             <Button variant="primary">

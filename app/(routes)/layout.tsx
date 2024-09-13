@@ -9,16 +9,16 @@ type Props = {
 
 const DashboardLayout = ({ children }: Props) => {
   return (
-    <main className="flex flex-col item-center justify-center h-screen ">
+    <main className="flex flex-col item-center justify-center h-screen">
       <Header />
-      <div className="flex h-full">
+      <div className="flex h-screen">
         <MobileHeader />
         {/* <SideBar className="hidden 2xl:flex" /> */}
         {/* <section className="flex h-full 2xl:pl-[120px]">{children}</section> */}
         {/* max-w-screen-xl */}
-        <section className="flex h-full  mx-auto">{children}</section>
+        <section>{children}</section>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </main>
   );
 };

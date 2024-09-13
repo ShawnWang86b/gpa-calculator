@@ -2,6 +2,13 @@ import { getSemesters } from "@/app/actions/semesterAction";
 import { List } from "./list";
 import CreateSemester from "./create-semester";
 import Image from "next/image";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { GridBackground } from "@/components/ui/gridBackground";
+import CourseSection from "@/app/components/CourseSection";
 
 const Learning = async () => {
   const semesters = await getSemesters();
@@ -22,10 +29,26 @@ const Learning = async () => {
   }
 
   return (
-    <section>
-      <CreateSemester />
-      <List semesters={semesters} />
-    </section>
+    <GridBackground>
+      <section className=" h-[91vh] w-screen flex justify-center px-96">
+        <ResizablePanelGroup direction="horizontal" className="bg-muted">
+          <ResizablePanel minSize={35}>
+            <div className="border-b-[1px] p-2 flex ">
+              <CreateSemester />
+            </div>
+            <div className=" h-full p-2 mr-2">
+              <List semesters={semesters} />
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel minSize={35}>
+            <div className="border-b-[1px] p-2">
+              <CourseSection />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </section>
+    </GridBackground>
   );
 };
 

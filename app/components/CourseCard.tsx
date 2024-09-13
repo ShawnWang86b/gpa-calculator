@@ -40,7 +40,7 @@ const CourseCard = ({ oneCourse }: Props) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="login">
+              <Button variant="primary">
                 <Pencil className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
@@ -52,7 +52,7 @@ const CourseCard = ({ oneCourse }: Props) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="login">
+              <Button variant="mars">
                 <Trash2 className="h-5 w-5" />
               </Button>
             </TooltipTrigger>

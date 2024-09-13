@@ -32,9 +32,12 @@ export const createCourse = async (courseInfo: {
       semesterId,
     })
     .returning();
+
+  revalidatePath("/learning");
+  redirect("/learning");
 };
 
-// Get all semesters
+// Get all courses
 export const getCourses = cache(async (semester_id: number) => {
   const { userId } = await auth();
 
@@ -52,3 +55,37 @@ export const getCourses = cache(async (semester_id: number) => {
 
   return data;
 });
+
+// Delete a courses
+export const deleteCourses = async (courseId: number) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!courseId) {
+    throw new Error("No course id finded");
+  }
+
+  await db.delete(courses).where(eq(courses.id, courseId));
+};
+
+// update a course
+export const updateCourse = async (
+  courseId: number,
+  updatedCourseName: string,
+  updatedPassingLine: number
+) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  await db
+    .update(courses)
+    .set({ courseName: updatedCourseName, passingLine: updatedPassingLine })
+    .where(eq(courses.id, courseId));
+  revalidatePath("/learning");
+};

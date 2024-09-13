@@ -14,6 +14,7 @@ import { Plus } from "lucide-react";
 import { createSemester } from "@/app/actions/semesterAction";
 import { useState } from "react";
 import Image from "next/image";
+import useStore from "@/app/store/useStore";
 
 const CreateSemester = () => {
   const [semesterName, setSemesterName] = useState("");
@@ -25,7 +26,7 @@ const CreateSemester = () => {
   };
 
   return (
-    <div className="flex mt-4 ml-2 mr-2.5 justify-between items-center">
+    <div className="flex ml-2 mr-2.5 justify-between items-center">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="secondary">

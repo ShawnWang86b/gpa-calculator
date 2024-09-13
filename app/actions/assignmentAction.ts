@@ -42,19 +42,20 @@ export const createAssignment = async (assignmentInfo: {
 };
 
 // Get all Assignment
-export const getAssignment = cache(async (semester_id: number) => {
+export const getAssignments = cache(async (courseId: number) => {
+  console.log("courseId--server", courseId);
   const { userId } = await auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
-  if (!semester_id) {
-    throw new Error("No semester created");
+  if (!courseId) {
+    throw new Error("No course founded");
   }
 
-  const data = await db.query.courses.findMany({
-    where: eq(courses.semesterId, semester_id),
+  const data = await db.query.assignments.findMany({
+    where: eq(assignments.courseId, courseId),
   });
 
   return data;

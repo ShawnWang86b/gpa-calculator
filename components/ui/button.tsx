@@ -17,7 +17,8 @@ const buttonVariants = cva(
 
         secondary:
           "bg-leaf/80 text-primary-foreground hover:bg-leaf-light border-leaf border-b-4 active:border-b-0",
-        secondaryOutline: "bg-white text-leaf hover:bg-slate-100",
+        secondaryOutline:
+          "bg-white text-leaf hover:text-leaf-light hover:bg-slate-100",
 
         mars: "bg-fire/80 text-primary-foreground hover:bg-fire-light border-fire border-b-4 active:border-b-0",
         marsOutline: "bg-white text-fire hover:bg-slate-100",

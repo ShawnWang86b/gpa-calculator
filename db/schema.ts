@@ -44,8 +44,8 @@ export const assignments = pgTable("assignments", {
   id: serial("id").primaryKey(),
   assignmentName: text("assignment_name").notNull(),
   weight: integer("weight").notNull(),
-  fullMark: integer("full_mark").default(0),
-  scored: integer("scored").default(0),
+  fullMark: integer("full_mark").notNull().default(0),
+  scored: integer("scored").notNull().default(0),
   courseId: integer("course_id")
     .notNull()
     .references(() => courses.id, { onDelete: "cascade" }), // Foreign key

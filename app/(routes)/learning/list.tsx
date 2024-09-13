@@ -2,18 +2,27 @@
 
 import SemesterCard from "@/app/components/SemesterCard";
 import { semesters } from "@/db/schema";
-type Props = {
+
+type Semesters = {
   semesters: Array<typeof semesters.$inferSelect>;
 };
 
-export const List = ({ semesters }: Props) => {
+type Semester = {
+  id: number;
+  semesterName: string;
+  userId: string;
+  createdAt: Date;
+};
+
+export const List = ({ semesters }: Semesters) => {
   return (
-    <div className="pt-6 grid grid-cols-2 gap-4 w-[1080px]">
-      {semesters.map((semester: any) => (
+    <div>
+      {semesters.map((semester: Semester) => (
         <SemesterCard
           key={semester.id}
-          semesterId={semester.id}
+          semesterId={String(semester.id)}
           semesterName={semester.semesterName}
+          createdAt={semester.createdAt}
         />
       ))}
     </div>

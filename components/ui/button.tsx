@@ -13,18 +13,18 @@ const buttonVariants = cva(
           "bg-white text-black border-slate-200 border-2 border-b-[4px] active:border-b-2 hover:bg-slate-100 text-slate-500",
         primary:
           "bg-info/80 text-primary-foreground hover:bg-info-light border-info border-b-4 active:border-b-0",
-        primaryOutline: "bg-white text-info hover:bg-slate-100",
+        primaryOutline: "bg-transparent text-info hover:bg-slate-100",
 
         secondary:
           "bg-leaf/80 text-primary-foreground hover:bg-leaf-light border-leaf border-b-4 active:border-b-0",
         secondaryOutline:
-          "bg-white text-leaf hover:text-leaf-light hover:bg-slate-100",
+          "bg-transparent text-leaf hover:text-leaf-light hover:bg-slate-100",
 
         mars: "bg-fire/80 text-primary-foreground hover:bg-fire-light border-fire border-b-4 active:border-b-0",
-        marsOutline: "bg-white text-fire hover:bg-slate-100",
+        marsOutline: "bg-transparent text-fire hover:bg-slate-100",
 
         gem: "bg-gem/80 text-primary-foreground hover:bg-gem-light border-gem border-b-4 active:border-b-0",
-        gemOutline: "bg-white text-gem hover:bg-slate-100",
+        gemOutline: "bg-transparent text-gem hover:bg-slate-100",
 
         ghost:
           "bg-transparent text-slate-500 border-transparent border-0 hover:bg-slate-100",

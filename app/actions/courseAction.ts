@@ -32,9 +32,6 @@ export const createCourse = async (courseInfo: {
       semesterId,
     })
     .returning();
-
-  revalidatePath("/learning");
-  redirect("/learning");
 };
 
 // Get all courses
@@ -65,7 +62,7 @@ export const deleteCourses = async (courseId: number) => {
   }
 
   if (!courseId) {
-    throw new Error("No course id finded");
+    throw new Error("No course id founded");
   }
 
   await db.delete(courses).where(eq(courses.id, courseId));
@@ -85,7 +82,9 @@ export const updateCourse = async (
 
   await db
     .update(courses)
-    .set({ courseName: updatedCourseName, passingLine: updatedPassingLine })
+    .set({
+      courseName: updatedCourseName,
+      passingLine: updatedPassingLine,
+    })
     .where(eq(courses.id, courseId));
-  revalidatePath("/learning");
 };

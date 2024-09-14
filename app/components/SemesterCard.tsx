@@ -60,8 +60,8 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
   return (
     <div
       className={cn(
-        "flex-col justify-center items-center border-[1px] border-info/30 p-3 bg-muted w-full h-[150px] m-2 min-w-[300px]",
-        isActive ? "bg-info-light" : "bg-white"
+        "flex-col justify-center items-center rounded-md border-[1px] border-info/30 p-3 bg-muted w-full h-[150px] m-2 min-w-[300px]",
+        isActive ? "bg-info-light/20" : "bg-white"
       )}
     >
       <div className="flex justify-between items-center">
@@ -84,7 +84,8 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
         <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
           <DialogTrigger asChild>
             <Button variant="primary">
-              <Pencil className="h-5 w-5 mr-2" /> <p>EDIT</p>
+              <Pencil className="h-5 w-5 mr-2" />
+              <p>EDIT</p>
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
@@ -125,7 +126,8 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
         <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
           <DialogTrigger asChild>
             <Button variant="mars">
-              <Trash2 className="h-5 w-5 mr-2" /> <p>DELETE</p>
+              <Trash2 className="h-5 w-5 mr-2" />
+              <p>DELETE</p>
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">

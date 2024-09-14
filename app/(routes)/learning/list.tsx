@@ -1,6 +1,7 @@
 "use client";
 
 import SemesterCard from "@/app/components/SemesterCard";
+import useStore from "@/app/store/useStore";
 import { semesters } from "@/db/schema";
 
 type Semesters = {
@@ -15,8 +16,14 @@ type Semester = {
 };
 
 export const List = ({ semesters }: Semesters) => {
+  const setSelectedSemesterId = useStore(
+    (state) => state.setSelectedSemesterId
+  );
+  const defaultSemesterId = semesters[0].id.toString();
+  setSelectedSemesterId(defaultSemesterId);
+
   return (
-    <div>
+    <div className="h-[800px] scroll-container">
       {semesters.map((semester: Semester) => (
         <SemesterCard
           key={semester.id}

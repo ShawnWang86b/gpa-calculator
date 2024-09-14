@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getCourses } from "@/app/actions/courseAction";
-import { CourseList } from "@/app/components/CourseList";
 import CreateCourse from "@/app/components/CreateCourse";
 import Image from "next/image";
 import useStore from "@/app/store/useStore";
@@ -19,6 +18,7 @@ const CourseSection = () => {
   const [courses, setCourses] = useState<Props[] | null>(null);
   const [createSuccessTrigger, setCreateSuccessTrigger] = useState(false);
   const semester_id = useStore((state) => state.selectedSemesterId);
+  const currentValue = useStore((state) => state.currentValue);
 
   useEffect(() => {
     if (semester_id) {
@@ -35,15 +35,14 @@ const CourseSection = () => {
     }
   }, [semester_id, createSuccessTrigger]);
 
-  console.log("semester_id", semester_id);
-  console.log("courses111", courses);
   if (!courses || courses.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-[90vh]">
+      <div className="flex flex-col justify-start mt-20 xl:mt-0 xl:justify-center items-center flex-grow min-h-[calc(100vh-80px)]">
         <Image src="/no_content.png" width={60} height={60} alt="no content" />
         <p className=" text-black font-semibold mt-2">No courses founded!</p>
         <p className="text-sm text-muted-foreground font-semibold mt-2">
-          You can create a new card by clicking the button or back
+          Click on a semester card, then hit the button to create a new course
+          card.
         </p>
         <div className="mt-2">
           <CreateCourse
@@ -57,14 +56,20 @@ const CourseSection = () => {
 
   return (
     <div>
-      <div className="border-b-[1px] p-1">
+      <div className="border-b-[1px] pb-2 ">
         <CreateCourse
           createSuccessTrigger={createSuccessTrigger}
           setCreateSuccessTrigger={setCreateSuccessTrigger}
         />
       </div>
 
-      {courses && <CourseTabs courses={courses} />}
+      {courses && (
+        <CourseTabs
+          courses={courses}
+          createSuccessTrigger={createSuccessTrigger}
+          setCreateSuccessTrigger={setCreateSuccessTrigger}
+        />
+      )}
     </div>
   );
 };

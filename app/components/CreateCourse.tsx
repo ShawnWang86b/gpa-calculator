@@ -26,7 +26,7 @@ type CourseInfo = {
 
 type Props = {
   createSuccessTrigger: boolean;
-  setCreateSuccessTriggerL: () => void;
+  setCreateSuccessTrigger: () => void;
 };
 
 const CreateCourse = ({
@@ -79,7 +79,7 @@ const CreateCourse = ({
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="secondary">
-            <Plus className="w-6 h-6 mr-2" /> <p>NEW</p>
+            <Plus className="w-6 h-6 mr-2" /> <p>COURSE</p>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">

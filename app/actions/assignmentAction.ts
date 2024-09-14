@@ -36,9 +36,6 @@ export const createAssignment = async (assignmentInfo: {
       courseId,
     })
     .returning();
-
-  revalidatePath("/courses");
-  //   redirect("/courses");
 };
 
 // Get all Assignment
@@ -60,3 +57,43 @@ export const getAssignments = cache(async (courseId: number) => {
 
   return data;
 });
+
+// delete a assignment
+export const deleteAssignment = async (assignmentsId: number) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!assignmentsId) {
+    throw new Error("No assignmentsId id founded");
+  }
+
+  await db.delete(assignments).where(eq(assignments.id, assignmentsId));
+};
+
+// update a assignment
+export const updateAssignment = async (
+  assignmentId: number,
+  updatedAssignmentName: string,
+  updatedWeight: number,
+  updatedFullMark: number,
+  updatedScored: number
+) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  await db
+    .update(assignments)
+    .set({
+      assignmentName: updatedAssignmentName,
+      weight: updatedWeight,
+      fullMark: updatedFullMark,
+      scored: updatedScored,
+    })
+    .where(eq(assignments.id, assignmentId));
+};

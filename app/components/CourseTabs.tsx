@@ -13,7 +13,7 @@ import FunctionBar from "@/app/components/FunctionBar";
 type Props = {
   courses: Array<typeof courses.$inferInsert>;
   createSuccessTrigger: boolean;
-  setCreateSuccessTrigger: any;
+  setCreateSuccessTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type Assignment = {
@@ -85,26 +85,30 @@ const CourseTabs = ({
       >
         <div>
           {assignments?.length === 0 ? (
-            <div className="flex flex-col justify-start mt-20 xl:mt-0 xl:justify-center items-center flex-grow min-h-[calc(100vh-300px)]">
-              <Image
-                src="/no_course.png"
-                width={60}
-                height={60}
-                alt="no course"
-              />
-              <p className=" text-black font-semibold mt-2">
-                No assignment founded!
-              </p>
-              <p className="text-sm text-muted-foreground font-semibold mt-2">
-                Hit the assignment button to create a new assignment card.
-              </p>
-              <div className="mt-2">
-                <CreateAssignment
+            <>
+              <div className="h-12 border-b-[1px]">
+                <FunctionBar
                   refetchTrigger={refetchTrigger}
                   setRefetchTrigger={setRefetchTrigger}
+                  createSuccessTrigger={createSuccessTrigger}
+                  setCreateSuccessTrigger={setCreateSuccessTrigger}
                 />
               </div>
-            </div>
+              <div className="flex flex-col justify-start mt-20 xl:mt-0 xl:justify-center items-center flex-grow min-h-[calc(100vh-300px)]">
+                <Image
+                  src="/no_course.png"
+                  width={60}
+                  height={60}
+                  alt="no course"
+                />
+                <p className=" text-black font-semibold mt-2">
+                  No assignment founded!
+                </p>
+                <p className="text-sm text-muted-foreground font-semibold mt-2">
+                  Hit the new assignment button to create a new assignment card.
+                </p>
+              </div>
+            </>
           ) : (
             <>
               <div className="h-12 border-b-[1px]">

@@ -48,13 +48,21 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
   };
 
   const handleEdit = () => {
-    updateSemester(Number(semesterId), newSemesterName);
-    setEditModalOpen(false);
+    try {
+      updateSemester(Number(semesterId), newSemesterName);
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error("Error edit semester:", error);
+    }
   };
 
   const handleDelete = () => {
-    deleteSemester(Number(semesterId));
-    setIsDeleteModalOpen(false);
+    try {
+      deleteSemester(Number(semesterId));
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error delete semester:", error);
+    }
   };
 
   return (
@@ -74,7 +82,7 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
         Hi, lets have a meeting tomorrow to discuss the project. Ive been
         reviewing the project details and have some ideas Id like to shar
       </div>
-      {/* <div className="flex-1 h-[1px] bg-slate-500 my-5" /> */}
+
       <div className="flex justify-end gap-5 mt-5 min-w-[200px]">
         <Button variant="primary" onClick={handleStoreSemesterId}>
           <Eye className="h-5 w-5 mr-2" />

@@ -14,7 +14,6 @@ import { Plus } from "lucide-react";
 import { createSemester } from "@/app/actions/semesterAction";
 import { useState } from "react";
 import Image from "next/image";
-import useStore from "@/app/store/useStore";
 
 const CreateSemester = () => {
   const [semesterName, setSemesterName] = useState("");

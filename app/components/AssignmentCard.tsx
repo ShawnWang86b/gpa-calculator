@@ -7,9 +7,12 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, Eye } from "lucide-react";
-import { useState } from "react";
-import { deleteAssignment } from "@/app/actions/assignmentAction";
+import { Pencil, Trash2 } from "lucide-react";
+import { ChangeEvent, useState } from "react";
+import {
+  deleteAssignment,
+  updateAssignment,
+} from "@/app/actions/assignmentAction";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 
@@ -25,7 +28,7 @@ type Assignment = {
 type Props = {
   assignment: Assignment;
   assignmentRefetchTrigger: boolean;
-  setAssignmentRefetchTrigger: () => void;
+  setAssignmentRefetchTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AssignmentCard = ({
@@ -33,19 +36,68 @@ const AssignmentCard = ({
   assignmentRefetchTrigger,
   setAssignmentRefetchTrigger,
 }: Props) => {
-  console.log("assignment", assignment);
+  const [assignmentInfo, setAssignmentInfo] = useState({
+    assignmentName: "",
+    weight: 0,
+    fullMark: 0,
+    scored: 0,
+  });
+
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const handleAssignmentNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignmentInfo((prevInfo) => ({
+      ...prevInfo,
+      assignmentName: e.target.value,
+    }));
+  };
+
+  const handleAssignmentWeightChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignmentInfo((prevInfo) => ({
+      ...prevInfo,
+      weight: Number(e.target.value),
+    }));
+  };
+
+  const handleAssignmentFullMarkChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignmentInfo((prevInfo) => ({
+      ...prevInfo,
+      fullMark: Number(e.target.value),
+    }));
+  };
+
+  const handleAssignmentScoredChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignmentInfo((prevInfo) => ({
+      ...prevInfo,
+      scored: Number(e.target.value),
+    }));
+  };
+
   const handleEdit = () => {
-    // updateSemester(Number(semesterId), newSemesterName);
-    // setEditModalOpen(false);
+    try {
+      updateAssignment(
+        Number(assignment.id),
+        assignmentInfo.assignmentName,
+        Number(assignmentInfo.weight),
+        Number(assignmentInfo.fullMark),
+        Number(assignmentInfo.scored)
+      );
+      setAssignmentRefetchTrigger(!assignmentRefetchTrigger);
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error("Error update assignmnent:", error);
+    }
   };
 
   const handleDelete = () => {
-    deleteAssignment(Number(assignment.id));
-    setAssignmentRefetchTrigger(!assignmentRefetchTrigger);
-    setIsDeleteModalOpen(false);
+    try {
+      deleteAssignment(Number(assignment.id));
+      setAssignmentRefetchTrigger(!assignmentRefetchTrigger);
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error delete assignmnent:", error);
+    }
   };
 
   return (
@@ -85,13 +137,31 @@ const AssignmentCard = ({
                     className="group-hover:animate-spin"
                   />
                   <p className="text-black font-semibold">
-                    You can update your semester card name
+                    You can update your assignment details
                   </p>
                   <Input
                     type="text"
-                    placeholder="Semester one ..."
+                    placeholder="Assignment Name, e.g. Technical report ..."
                     className="focus:border-1 focus:border-info"
-                    // onChange={(e) => setNewSemesterName(e.target.value)}
+                    onChange={handleAssignmentNameChange}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="The weight of assignment, e.g. 50"
+                    className="focus:border-1 focus:border-info"
+                    onChange={handleAssignmentWeightChange}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="The full mark of this assignment, e.g. 100"
+                    className="focus:border-1 focus:border-info"
+                    onChange={handleAssignmentFullMarkChange}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="The scored of this assignment, e.g. 85"
+                    className="focus:border-1 focus:border-info"
+                    onChange={handleAssignmentScoredChange}
                   />
                 </div>
               </DialogDescription>

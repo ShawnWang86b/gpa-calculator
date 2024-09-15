@@ -10,11 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowBigLeftDash, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { createCourse } from "@/app/actions/courseAction";
-import Link from "next/link";
 import Image from "next/image";
 import useStore from "@/app/store/useStore";
 
@@ -39,7 +37,7 @@ const CreateCourse = ({
     passingLine: 50,
     semesterId: Number(selectedSemesterId),
   });
-  console.log("courseInfo", courseInfo);
+
   //FIXME: passingLine can't over 100
   // FIXME: some limit for courseName
   const [isOpen, setIsOpen] = useState(false);

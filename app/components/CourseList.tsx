@@ -9,7 +9,6 @@ type Props = {
 };
 
 export const CourseList = ({ courses }: Props) => {
-  console.log("courses", courses);
   return (
     <div className="pt-6 grid grid-cols-3 gap-4">
       {courses.map((course: any) => (

@@ -3,11 +3,8 @@
 import { cache } from "react";
 import db from "@/db/drizzle";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { semesters, courses, assignments } from "@/db/schema";
-
+import { assignments } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 // Create a semester card
 export const createAssignment = async (assignmentInfo: {
@@ -40,7 +37,6 @@ export const createAssignment = async (assignmentInfo: {
 
 // Get all Assignment
 export const getAssignments = cache(async (courseId: number) => {
-  console.log("courseId--server", courseId);
   const { userId } = await auth();
 
   if (!userId) {

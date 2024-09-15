@@ -10,12 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowBigLeftDash, Plus } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
-import { createCourse } from "@/app/actions/courseAction";
+import { Plus } from "lucide-react";
+import { ChangeEvent, useState } from "react";
 import { createAssignment } from "@/app/actions/assignmentAction";
-import Link from "next/link";
 import Image from "next/image";
 import useStore from "@/app/store/useStore";
 
@@ -29,12 +26,12 @@ type AssignmentInfo = {
 
 type Props = {
   refetchTrigger: boolean;
-  setRefetchTrigger: () => void;
+  setRefetchTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const CreateAssignment = ({ refetchTrigger, setRefetchTrigger }: any) => {
+const CreateAssignment = ({ refetchTrigger, setRefetchTrigger }: Props) => {
   const course_Id = useStore((state) => state.currentValue);
-  console.log("courseId", course_Id);
+
   const [assignmentInfo, setAssignmentInfo] = useState<AssignmentInfo>({
     assignmentName: "",
     weight: 0,

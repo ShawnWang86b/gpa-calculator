@@ -10,19 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowBigLeftDash, Pencil, Plus, Trash2 } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
-import {
-  createCourse,
-  deleteCourses,
-  updateCourse,
-} from "@/app/actions/courseAction";
-import {
-  createAssignment,
-  deleteAssignment,
-} from "@/app/actions/assignmentAction";
-import Link from "next/link";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ChangeEvent, useState } from "react";
+import { deleteCourses, updateCourse } from "@/app/actions/courseAction";
+import { createAssignment } from "@/app/actions/assignmentAction";
 import Image from "next/image";
 import useStore from "@/app/store/useStore";
 
@@ -42,9 +33,9 @@ type CourseUpdateInfo = {
 
 type Props = {
   refetchTrigger: boolean;
-  setRefetchTrigger: () => void;
+  setRefetchTrigger: React.Dispatch<React.SetStateAction<boolean>>;
   createSuccessTrigger: boolean;
-  setCreateSuccessTrigger: () => void;
+  setCreateSuccessTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const FunctionBar = ({
@@ -52,9 +43,9 @@ const FunctionBar = ({
   setRefetchTrigger,
   createSuccessTrigger,
   setCreateSuccessTrigger,
-}: any) => {
+}: Props) => {
   const course_Id = useStore((state) => state.currentValue);
-  console.log("courseId", course_Id);
+
   const [assignmentInfo, setAssignmentInfo] = useState<AssignmentInfo>({
     assignmentName: "",
     weight: 0,
@@ -62,6 +53,7 @@ const FunctionBar = ({
     scored: 0,
     courseId: course_Id,
   });
+
   const [courseUpdateInfo, setCourseUpdateInfo] = useState<CourseUpdateInfo>({
     courseName: "",
     passingLine: 0,

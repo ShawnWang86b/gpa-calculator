@@ -11,6 +11,7 @@ type Semesters = {
 type Semester = {
   id: number;
   semesterName: string;
+  semesterDesc: string;
   userId: string;
   createdAt: Date;
 };
@@ -19,6 +20,8 @@ export const List = ({ semesters }: Semesters) => {
   const setSelectedSemesterId = useStore(
     (state) => state.setSelectedSemesterId
   );
+
+  // set a default semester Id when user first navigate to route /learning
   const defaultSemesterId = semesters[0].id.toString();
   setSelectedSemesterId(defaultSemesterId);
 
@@ -29,6 +32,7 @@ export const List = ({ semesters }: Semesters) => {
           key={semester.id}
           semesterId={String(semester.id)}
           semesterName={semester.semesterName}
+          semesterDesc={semester.semesterDesc}
           createdAt={semester.createdAt}
         />
       ))}

@@ -10,19 +10,57 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useEffect, useState } from "react";
 import { deleteSemester, updateSemester } from "@/app/actions/semesterAction";
 import useStore from "@/app/store/useStore";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
 
 type Props = {
   semesterId: string;
   semesterName: string;
+  semesterDesc: string;
   createdAt: Date;
 };
 
-const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
+type SemesterFormData = z.infer<typeof semesterSchema>;
+const semesterSchema = z.object({
+  semesterName: z
+    .string()
+    .min(3, { message: "Semester name must be at least 3 characters" })
+    .max(50, { message: "Semester name cannot exceed 50 characters" }),
+  semesterDesc: z
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters.",
+    })
+    .max(160, {
+      message: "Description must not be longer than 30 characters.",
+    }),
+});
+
+const SemesterCard = ({
+  semesterId,
+  semesterName,
+  semesterDesc,
+  createdAt,
+}: Props) => {
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -47,14 +85,32 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
     selectedSemesterId(semesterId);
   };
 
-  const handleEdit = () => {
+  const form = useForm<z.infer<typeof semesterSchema>>({
+    resolver: zodResolver(semesterSchema),
+    defaultValues: {
+      semesterName: semesterName,
+      semesterDesc: semesterDesc,
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof semesterSchema>) {
+    setLoading(true);
     try {
-      updateSemester(Number(semesterId), newSemesterName);
+      updateSemester(
+        Number(semesterId),
+        values.semesterName,
+        values.semesterDesc
+      );
       setEditModalOpen(false);
+      toast({
+        title: "Semester card update success!",
+      });
     } catch (error) {
-      console.error("Error edit semester:", error);
+      console.error("Error updating semester:", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   const handleDelete = () => {
     try {
@@ -68,9 +124,10 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
   return (
     <div
       className={cn(
-        "flex-col justify-center items-center rounded-md border-[1px] border-info/30 p-3 bg-muted w-full h-[150px] m-2 min-w-[300px]",
+        "flex-col justify-center items-center rounded-md border-[1px] border-info/30 p-3 bg-muted w-full h-[150px] m-2 min-w-[300px] cursor-pointer",
         isActive ? "bg-info-light/20" : "bg-white"
       )}
+      onClick={handleStoreSemesterId}
     >
       <div className="flex justify-between items-center">
         <div className="font-semibold">{semesterName}</div>
@@ -79,15 +136,14 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
         </div>
       </div>
       <div className="line-clamp-2 text-xs text-muted-foreground">
-        Hi, lets have a meeting tomorrow to discuss the project. Ive been
-        reviewing the project details and have some ideas Id like to shar
+        {semesterDesc}
       </div>
 
       <div className="flex justify-end gap-5 mt-5 min-w-[200px]">
-        <Button variant="primary" onClick={handleStoreSemesterId}>
+        {/* <Button variant="primary" onClick={handleStoreSemesterId}>
           <Eye className="h-5 w-5 mr-2" />
           <p>CHECK</p>
-        </Button>
+        </Button> */}
 
         <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
           <DialogTrigger asChild>
@@ -97,37 +153,83 @@ const SemesterCard = ({ semesterId, semesterName, createdAt }: Props) => {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogDescription>
-                <div className="flex flex-col items-center gap-5">
-                  <Image
-                    src="/edit_confirm.png"
-                    height={60}
-                    width={60}
-                    alt="planets"
-                    className="group-hover:animate-spin"
-                  />
-                  <p className="text-black font-semibold">
-                    You can update your semester card name
-                  </p>
-                  <Input
-                    type="text"
-                    placeholder="Semester one ..."
-                    className="focus:border-1 focus:border-info"
-                    onChange={(e) => setNewSemesterName(e.target.value)}
-                  />
-                </div>
-              </DialogDescription>
-            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <DialogHeader>
+                  <DialogDescription>
+                    <div className="flex flex-col items-center gap-5">
+                      <Image
+                        src="/edit_confirm.png"
+                        height={60}
+                        width={60}
+                        alt="planets"
+                        className="group-hover:animate-spin"
+                      />
+                      <p className="text-black font-semibold">
+                        You can update your semester card name
+                      </p>
+                      <FormField
+                        control={form.control}
+                        name="semesterName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Semester Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Semester one ..."
+                                autoComplete="off"
+                                className="focus:border-1 focus:border-info w-[300px] h-[50px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {/* <Input
+                        type="text"
+                        placeholder="Semester one ..."
+                        className="focus:border-1 focus:border-info"
+                        onChange={(e) => setNewSemesterName(e.target.value)}
+                      /> */}
+                      <FormField
+                        control={form.control}
+                        name="semesterDesc"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Some descriptions ..."
+                                className="resize-none focus:border-1 focus:border-info w-[300px] h-[100px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
 
-            <DialogFooter className="mt-5">
-              <Button variant="ghost" onClick={() => setEditModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary" onClick={handleEdit}>
-                Submit
-              </Button>
-            </DialogFooter>
+                <DialogFooter className="mt-5">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setEditModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="primary">
+                    Save
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
 

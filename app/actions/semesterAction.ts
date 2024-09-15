@@ -9,7 +9,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 // Create a semester card
-export const createSemester = async (semesterName: string) => {
+export const createSemester = async (
+  semesterName: string,
+  semesterDesc: string
+) => {
   const { userId } = await auth();
   const user = await currentUser();
 
@@ -21,6 +24,7 @@ export const createSemester = async (semesterName: string) => {
     .insert(semesters)
     .values({
       semesterName,
+      semesterDesc,
       userId,
     })
     .returning();
@@ -60,7 +64,8 @@ export const deleteSemester = async (semester_id: number) => {
 // Update the semester info
 export const updateSemester = async (
   semester_id: number,
-  updatedSemesterName: string
+  updatedSemesterName: string,
+  updatedSemesterDesc: string
 ) => {
   const { userId } = await auth();
 
@@ -70,7 +75,10 @@ export const updateSemester = async (
 
   await db
     .update(semesters)
-    .set({ semesterName: updatedSemesterName })
+    .set({
+      semesterName: updatedSemesterName,
+      semesterDesc: updatedSemesterDesc,
+    })
     .where(eq(semesters.id, semester_id));
   revalidatePath("/learning");
 };

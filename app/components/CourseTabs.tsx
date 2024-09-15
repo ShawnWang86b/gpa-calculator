@@ -6,18 +6,28 @@ import { useEffect, useState } from "react";
 import useStore from "@/app/store/useStore";
 import Image from "next/image";
 import { getAssignments } from "../actions/assignmentAction";
-import AssignmentCard from "./AssignmentCard";
-import CreateAssignment from "./CreateAssignment";
+import AssignmentCard from "@/app/components/AssignmentCard";
 import FunctionBar from "@/app/components/FunctionBar";
 
 type Props = {
-  courses: Array<typeof courses.$inferInsert>;
+  courses: Array<typeof courses.$inferSelect>;
   createSuccessTrigger: boolean;
   setCreateSuccessTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+type Course = {
+  id: number;
+  courseName: string;
+  passingLine: number;
+};
+
 type Assignment = {
-  assignments: typeof assignments.$inferInsert;
+  assignmentName: string;
+  weight: number;
+  fullMark: number;
+  scored: number;
+  id: number;
+  courseId: number;
 };
 
 const CourseTabs = ({
@@ -27,11 +37,12 @@ const CourseTabs = ({
 }: Props) => {
   const currentValue = useStore((state) => state.currentValue);
   const setCurrentValue = useStore((state) => state.setCurrentValue);
+  const [currentCourse, setCurrentCourse] = useState<Course>();
   const [assignments, setAssignments] = useState<Assignment[] | undefined>([]);
   const [refetchTrigger, setRefetchTrigger] = useState(false);
   const [assignmentRefetchTrigger, setAssignmentRefetchTrigger] =
     useState(false);
-  // FIXME: here has bug, fix later
+
   useEffect(() => {
     if (courses.length > 0 && !currentValue) {
       const firstCourseId = courses[0].id;
@@ -43,15 +54,18 @@ const CourseTabs = ({
 
   useEffect(() => {
     if (courses && currentValue) {
-      const course = courses.find((course: any) => currentValue === course.id);
+      const course = courses.find(
+        (course: Course) => currentValue === course.id
+      );
+
+      setCurrentCourse(course);
       const courseId = course?.id;
 
       if (courseId) {
         const fetchAssignments = async () => {
           try {
             const result = await getAssignments(Number(courseId));
-            console.log("result", result);
-            //@ts-ignore
+
             setAssignments(result);
           } catch (error) {
             console.error("Error fetching assignments:", error);
@@ -74,7 +88,15 @@ const CourseTabs = ({
               className="mr-1"
               onClick={() => setCurrentValue(course.id)}
             >
-              {course.courseName}
+              <div>
+                <p> {course.courseName}</p>
+                <div className="text-xs">
+                  Passing line: {course.passingLine}%
+                </div>
+                <div className="text-xs">
+                  Courses number: {assignments?.length || 0}
+                </div>
+              </div>
             </TabsTrigger>
           </>
         ))}
@@ -88,6 +110,8 @@ const CourseTabs = ({
             <>
               <div className="h-12 border-b-[1px]">
                 <FunctionBar
+                  courseName={currentCourse?.courseName}
+                  passingLine={currentCourse?.passingLine}
                   refetchTrigger={refetchTrigger}
                   setRefetchTrigger={setRefetchTrigger}
                   createSuccessTrigger={createSuccessTrigger}
@@ -113,6 +137,8 @@ const CourseTabs = ({
             <>
               <div className="h-12 border-b-[1px]">
                 <FunctionBar
+                  courseName={currentCourse?.courseName}
+                  passingLine={currentCourse?.passingLine}
                   refetchTrigger={refetchTrigger}
                   setRefetchTrigger={setRefetchTrigger}
                   createSuccessTrigger={createSuccessTrigger}

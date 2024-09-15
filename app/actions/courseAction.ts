@@ -3,18 +3,15 @@
 import { cache } from "react";
 import db from "@/db/drizzle";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { semesters, courses } from "@/db/schema";
-
+import { courses } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 // Create a semester card
-export const createCourse = async (courseInfo: {
-  courseName: string;
-  passingLine: number;
-  semesterId: number;
-}) => {
+export const createCourse = async (
+  semesterId: number,
+  courseName: string,
+  passingLine: number
+) => {
   const { userId } = await auth();
   const user = await currentUser();
 
@@ -22,15 +19,9 @@ export const createCourse = async (courseInfo: {
     throw new Error("Unauthorized");
   }
 
-  const { courseName, passingLine, semesterId } = courseInfo;
-  console.log("courseInfo", courseInfo);
   await db
     .insert(courses)
-    .values({
-      courseName,
-      passingLine,
-      semesterId,
-    })
+    .values({ semesterId, courseName, passingLine })
     .returning();
 };
 

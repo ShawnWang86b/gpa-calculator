@@ -1,7 +1,4 @@
 import Header from "@/app/components/Layout/Header";
-import Footer from "@/app/components/Layout/Footer";
-import SideBar from "@/app/components/Layout/SideBar";
-import MobileHeader from "@/app/components/Layout/MobileHeader";
 
 type Props = {
   children: React.ReactNode;

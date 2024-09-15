@@ -1,30 +1,11 @@
 import { relations } from "drizzle-orm";
-import {
-  pgTable,
-  serial,
-  text,
-  integer,
-  timestamp,
-  foreignKey,
-} from "drizzle-orm/pg-core";
-
-// Users table
-// export const users = pgTable("users", {
-//   id: serial("id").primaryKey(),
-//   name: text("name").notNull(),
-//   email: text("email").notNull(),
-//   clerkId: text("clerkId").notNull(),
-//   firstName: text("firstName").notNull(),
-//   lastName: text("lastName").notNull(),
-//   photo: text("photo").notNull(),
-//   createdAt: timestamp("created_at").notNull().defaultNow(),
-//   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-// });
+import { pgTable, serial, text, integer, timestamp } from "drizzle-orm/pg-core";
 
 // Semesters table
 export const semesters = pgTable("semesters", {
   id: serial("id").primaryKey(),
   semesterName: text("semester_name").notNull(),
+  semesterDesc: text("semester_desc").notNull(),
   userId: text("user_id").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -36,7 +17,7 @@ export const courses = pgTable("courses", {
   passingLine: integer("passing_line").notNull(),
   semesterId: integer("semester_id")
     .notNull()
-    .references(() => semesters.id, { onDelete: "cascade" }), // Foreign key
+    .references(() => semesters.id, { onDelete: "cascade" }),
 });
 
 // Assignments table
@@ -48,11 +29,10 @@ export const assignments = pgTable("assignments", {
   scored: integer("scored").notNull().default(0),
   courseId: integer("course_id")
     .notNull()
-    .references(() => courses.id, { onDelete: "cascade" }), // Foreign key
+    .references(() => courses.id, { onDelete: "cascade" }),
 });
 
 // Define relationships
-
 export const semestersRelations = relations(semesters, ({ many }) => ({
   courses: many(courses),
 }));

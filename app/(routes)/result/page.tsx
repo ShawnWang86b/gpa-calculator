@@ -2,6 +2,8 @@
 
 import useStore from "@/app/store/useStore";
 import { BackgroundLines } from "@/components/ui/background-lines";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const Result = () => {
   const prediction = useStore((state) => state.predictionValue);
@@ -13,12 +15,24 @@ const Result = () => {
         {prediction.userName}
       </h2>
       <p className="max-w-xl mx-auto text-sm md:text-lg text-neutral-700 dark:text-neutral-400 text-center">
-        To reach your target score of {prediction.assignmentTargetScore} <br />
-        you need to get
-        {prediction.requireScore > 100
-          ? `This score is not achievable.`
-          : prediction.requireScore}
+        To reach your target score of {prediction.assignmentTargetScore} on
+        course{" "}
+        <span className="text-3xl font-bold text-fire">
+          {prediction.assignmentName}
+        </span>{" "}
+        <br />
+        you need to get:
+        <span className="text-3xl font-bold text-fire">
+          {prediction.requireScore > 100
+            ? `This score is not achievable.`
+            : ` ${prediction.requireScore}`}
+        </span>
       </p>
+      <div className="mt-5 z-10">
+        <Link href="/">
+          <Button variant="primary">BACK TO LANDING PAGE</Button>
+        </Link>
+      </div>
     </BackgroundLines>
   );
 };

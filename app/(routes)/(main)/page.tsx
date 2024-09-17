@@ -31,7 +31,12 @@ const Home = () => {
         {/* Hero Image group */}
         <div className="flex flex-col xl:flex-row justify-center items-center gap-40 flex-grow min-h-[calc(100vh-80px)]">
           <div>
-            <Image src="/hero.png" alt="hero image" width={600} height={600} />
+            <Image
+              src="/planets/hero.png"
+              alt="hero image"
+              width={600}
+              height={600}
+            />
           </div>
           <div>
             <div className="flex flex-col justify-center items-start">

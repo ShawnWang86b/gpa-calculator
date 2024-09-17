@@ -27,6 +27,7 @@ export const assignments = pgTable("assignments", {
   weight: integer("weight").notNull(),
   fullMark: integer("full_mark").notNull().default(0),
   scored: integer("scored").notNull().default(0),
+  hurdle: integer("hurdle").default(50),
   courseId: integer("course_id")
     .notNull()
     .references(() => courses.id, { onDelete: "cascade" }),

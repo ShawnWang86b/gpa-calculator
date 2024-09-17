@@ -12,6 +12,7 @@ export const createAssignment = async (
   weight: number,
   fullMark: number,
   scored: number,
+  hurdle: number,
   courseId: number
 ) => {
   const { userId } = await auth();
@@ -28,6 +29,7 @@ export const createAssignment = async (
       weight,
       fullMark,
       scored,
+      hurdle,
       courseId,
     })
     .returning();
@@ -73,7 +75,8 @@ export const updateAssignment = async (
   updatedAssignmentName: string,
   updatedWeight: number,
   updatedFullMark: number,
-  updatedScored: number
+  updatedScored: number,
+  updatedHurdle: number
 ) => {
   const { userId } = await auth();
 
@@ -88,6 +91,7 @@ export const updateAssignment = async (
       weight: updatedWeight,
       fullMark: updatedFullMark,
       scored: updatedScored,
+      hurdle: updatedHurdle,
     })
     .where(eq(assignments.id, assignmentId));
 };

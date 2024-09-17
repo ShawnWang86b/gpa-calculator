@@ -15,6 +15,20 @@
       "when": 1726396614135,
       "tag": "0001_chunky_carlie_cooper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1726566546366,
+      "tag": "0002_wise_siren",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1726566645351,
+      "tag": "0003_small_warpath",
+      "breakpoints": true
     }
   ]
 }

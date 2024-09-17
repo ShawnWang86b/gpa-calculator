@@ -28,6 +28,7 @@ type Assignment = {
   fullMark: number;
   scored: number;
   id: number;
+  hurdle: number;
   courseId: number;
 };
 
@@ -38,6 +39,7 @@ const CourseTabs = ({
 }: Props) => {
   const currentValue = useStore((state) => state.currentValue);
   const setCurrentValue = useStore((state) => state.setCurrentValue);
+  const setAssingmentValue = useStore((state) => state.setAssignmentValue);
   const [currentCourse, setCurrentCourse] = useState<Course>();
   const [assignments, setAssignments] = useState<Assignment[] | undefined>([]);
   const [refetchTrigger, setRefetchTrigger] = useState(false);
@@ -69,8 +71,9 @@ const CourseTabs = ({
         const fetchAssignments = async () => {
           try {
             const result = await getAssignments(Number(courseId));
-
+            //@ts-ignore
             setAssignments(result);
+            setAssingmentValue(result);
           } catch (error) {
             console.error("Error fetching assignments:", error);
           }
@@ -79,7 +82,13 @@ const CourseTabs = ({
         fetchAssignments();
       }
     }
-  }, [currentValue, courses, refetchTrigger, assignmentRefetchTrigger]);
+  }, [
+    currentValue,
+    courses,
+    refetchTrigger,
+    assignmentRefetchTrigger,
+    setAssingmentValue,
+  ]);
 
   const handleAssignmentNumber = async (course_id: number) => {
     const result = await getAssignments(course_id);
@@ -107,7 +116,9 @@ const CourseTabs = ({
               value={course.id.toString()}
               key={course.id}
               className="mr-1"
-              onClick={() => setCurrentValue(course.id)}
+              onClick={() => {
+                setCurrentValue(course.id);
+              }}
             >
               <div>
                 <p> {course.courseName}</p>
@@ -115,7 +126,8 @@ const CourseTabs = ({
                   Passing line: {course.passingLine}%
                 </div>
                 <div className="text-xs">
-                  Courses number: {assignmentCounts[course.id] ?? "Loading..."}
+                  Assignments number:{" "}
+                  {assignmentCounts[course.id] ?? "Loading..."}
                 </div>
               </div>
             </TabsTrigger>
@@ -167,9 +179,9 @@ const CourseTabs = ({
                   setCreateSuccessTrigger={setCreateSuccessTrigger}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-5 bg-slate-100">
+              <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-5 2xl:grid-cols-3 2xl:gap-x-12 mt-5 bg-slate-100 ">
                 {assignments?.map((assignment: Assignment) => (
-                  <div key={assignment.id}>
+                  <div key={assignment.id} className="min-w-[200px]">
                     <AssignmentCard
                       assignment={assignment}
                       assignmentRefetchTrigger={assignmentRefetchTrigger}

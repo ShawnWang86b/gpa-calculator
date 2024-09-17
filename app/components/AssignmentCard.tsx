@@ -40,6 +40,7 @@ type Assignment = {
   weight: number;
   fullMark: number;
   scored: number;
+  hurdle: number;
   courseId: number;
 };
 
@@ -65,6 +66,13 @@ const assignmentSchema = z
     scored: z.number().refine((val) => val >= 1 && val <= 500, {
       message: "Scored mark must be between 1 and 500.",
     }),
+    hurdle: z
+      .number()
+      .optional()
+      .default(50)
+      .refine((val) => val >= 1 && val <= 100, {
+        message: "Hurdle must be between 1 and 100.",
+      }),
   })
   .superRefine((data, ctx) => {
     if (data.scored > data.fullMark) {
@@ -93,6 +101,7 @@ const AssignmentCard = ({
       weight: assignment.weight,
       fullMark: assignment.fullMark,
       scored: assignment.scored,
+      hurdle: assignment.hurdle,
     },
   });
 
@@ -106,7 +115,8 @@ const AssignmentCard = ({
         values.assignmentName,
         Number(values.weight),
         Number(values.fullMark),
-        Number(values.scored)
+        Number(values.scored),
+        Number(values.hurdle)
       );
       setAssignmentRefetchTrigger(!assignmentRefetchTrigger);
       setEditModalOpen(false);
@@ -131,7 +141,7 @@ const AssignmentCard = ({
   };
 
   return (
-    <div className="border-[1px] border-info/30 rounded-md p-4 bg-muted w-[300px] mb-2">
+    <div className="border-[1px] border-info/30 rounded-md p-4 bg-muted w-[280px] mb-2">
       <p className="font-bold uppercase">{assignment.assignmentName}</p>
       <div className="mt-4">
         <div className="flex items-center justify-between">
@@ -147,6 +157,10 @@ const AssignmentCard = ({
           <p className="text-sm">
             <span className="">{assignment.scored}</span>/{assignment.fullMark}
           </p>
+        </div>
+        <div className="flex items-center justify-between">
+          <p>Hurdle:</p>
+          <p className="text-sm">{assignment.hurdle}</p>
         </div>
       </div>
       <div className="flex mt-4 justify-end">

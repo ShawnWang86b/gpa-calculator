@@ -55,7 +55,7 @@ const CourseSection = () => {
   }
 
   return (
-    <div>
+    <div className="scroll-container">
       <div className="border-b-[1px] pb-2 ">
         <CreateCourse
           createSuccessTrigger={createSuccessTrigger}

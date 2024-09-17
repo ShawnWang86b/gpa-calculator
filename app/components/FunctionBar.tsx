@@ -25,7 +25,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Pencil, FilePlus, Trash2, FileChartLine } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteCourses, updateCourse } from "@/app/actions/courseAction";
 import { createAssignment } from "@/app/actions/assignmentAction";
 import Image from "next/image";
@@ -34,6 +34,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
+import { evaluateAssignments } from "../utils/evaluateAssignments";
+import { getFinalAssignmentWeight } from "../utils/getFinalAssignmentWeight";
+import { useRouter } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
 
 type CourseFormData = z.infer<typeof courseSchema>;
 type AssignmentFormData = z.infer<typeof assignmentSchema>;
@@ -64,6 +69,13 @@ const assignmentSchema = z
     scored: z.number().refine((val) => val >= 1 && val <= 500, {
       message: "Scored mark must be between 1 and 500.",
     }),
+    hurdle: z
+      .number()
+      .optional()
+      .default(50)
+      .refine((val) => val >= 1 && val <= 100, {
+        message: "Hurdle must be between 1 and 100.",
+      }),
   })
   .superRefine((data, ctx) => {
     if (data.scored > data.fullMark) {
@@ -83,9 +95,16 @@ const predictionSchema = z.object({
   weight: z.number().refine((val) => val >= 1 && val <= 100, {
     message: "Passing line must be between 1 and 100.",
   }),
-  fullMark: z.number().refine((val) => val >= 1 && val <= 500, {
-    message: "Passing line must be between 1 and 500.",
+  targetScore: z.number().refine((val) => val >= 1 && val <= 100, {
+    message: "Target score must be between 1 and 100.",
   }),
+  hurdle: z
+    .number()
+    .optional()
+    .default(50)
+    .refine((val) => val >= 1 && val <= 100, {
+      message: "Hurdle must be between 1 and 100.",
+    }),
 });
 
 type FunctionBarProps = {
@@ -105,14 +124,20 @@ const FunctionBar = ({
   createSuccessTrigger,
   setCreateSuccessTrigger,
 }: FunctionBarProps) => {
+  const { user } = useUser();
+  const userName = user?.username || `${user?.firstName}`;
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const course_Id = useStore((state) => state.currentValue);
-
+  const assignments = useStore((state) => state.assignmentsValue);
+  const setPredictScore = useStore((state) => state.setPredictionValue);
   const [isOpen, setIsOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPredictionModalOpen, setIsPredictionModalOpen] = useState(false);
+
+  const [defaultWeight, setDefaultWeight] = useState(0);
 
   const courseForm = useForm<z.infer<typeof courseSchema>>({
     resolver: zodResolver(courseSchema),
@@ -129,6 +154,7 @@ const FunctionBar = ({
       weight: undefined,
       fullMark: undefined,
       scored: undefined,
+      hurdle: 50,
     },
   });
 
@@ -136,10 +162,27 @@ const FunctionBar = ({
     resolver: zodResolver(predictionSchema),
     defaultValues: {
       assignmentName: "",
-      weight: undefined,
-      fullMark: undefined,
+      weight: defaultWeight,
+      hurdle: 50,
+      targetScore: 50,
     },
   });
+  const { reset, watch } = predictionForm;
+
+  useEffect(() => {
+    if (assignments && assignments.length > 0) {
+      const finalWeight = getFinalAssignmentWeight(assignments);
+      console.log("finalWeight", finalWeight);
+      setDefaultWeight(finalWeight);
+
+      reset({
+        assignmentName: "",
+        weight: finalWeight,
+        hurdle: 50,
+        targetScore: 50,
+      });
+    }
+  }, [assignments, reset]);
 
   async function handleCourseSubmit(values: z.infer<typeof courseSchema>) {
     setLoading(true);
@@ -177,6 +220,7 @@ const FunctionBar = ({
         values.weight,
         values.fullMark,
         values.scored,
+        values.hurdle,
         course_Id
       );
       setRefetchTrigger(!refetchTrigger);
@@ -194,25 +238,31 @@ const FunctionBar = ({
   async function handlePredictionSubmit(
     values: z.infer<typeof predictionSchema>
   ) {
-    //   setLoading(true);
-    //   try {
-    //     await createAssignment(
-    //       values.assignmentName,
-    //       values.weight,
-    //       values.fullMark,
-    //       values.scored,
-    //       course_Id
-    //     );
-    //     setRefetchTrigger(!refetchTrigger);
-    //     setIsPredictionModalOpen(false);
-    //     toast({
-    //       title: "Create assignment card success!",
-    //     });
-    //   } catch (error) {
-    //     console.error("Error creating card:", error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
+    setLoading(true);
+    try {
+      const finalWeight = getFinalAssignmentWeight(assignments);
+      setDefaultWeight(finalWeight);
+
+      const requireScore = evaluateAssignments(assignments, values);
+
+      const predictResult = {
+        userName,
+        requireScore,
+        assignmentName: values.assignmentName,
+        assignmentTargetScore: values.targetScore,
+      };
+      console.log("predictResult", predictResult);
+      setPredictScore(predictResult);
+      setIsPredictionModalOpen(false);
+      toast({
+        title: "Prediction processing!",
+      });
+      router.push("/result");
+    } catch (error) {
+      console.error("Error creating card:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -478,6 +528,29 @@ const FunctionBar = ({
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={assignmentForm.control}
+                      name="hurdle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Hurdle</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Hurdle, default is 50"
+                              autoComplete="off"
+                              className="focus:border-1 focus:border-leaf w-[300px] h-[50px]"
+                              {...field}
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(parseInt(e.target.value));
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </DialogDescription>
               </DialogHeader>
@@ -575,16 +648,40 @@ const FunctionBar = ({
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={predictionForm.control}
-                      name="fullMark"
+                      name="hurdle"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full mark</FormLabel>
+                          <FormLabel>Hurdle</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
-                              placeholder="Assignment full mark, e.g. 100"
+                              placeholder="Hurdle, default is 50"
+                              autoComplete="off"
+                              className="focus:border-1 focus:border-leaf w-[300px] h-[50px]"
+                              {...field}
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(parseInt(e.target.value));
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={predictionForm.control}
+                      name="targetScore"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target score</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="target score, default is 50"
                               autoComplete="off"
                               className="focus:border-1 focus:border-leaf w-[300px] h-[50px]"
                               {...field}

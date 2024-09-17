@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Pencil, Trash2, Eye } from "lucide-react";
@@ -18,6 +20,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import { deleteSemester, updateSemester } from "@/app/actions/semesterAction";
 import useStore from "@/app/store/useStore";
@@ -124,7 +132,7 @@ const SemesterCard = ({
   return (
     <div
       className={cn(
-        "flex-col justify-center items-center rounded-md border-[1px] border-info/30 p-3 bg-muted w-full h-[150px] m-2 min-w-[300px] cursor-pointer",
+        "flex-col justify-center items-center rounded-md border-[1px] border-info/30 p-3 bg-muted w-full h-[130px] m-2 min-w-[300px] cursor-pointer",
         isActive ? "bg-info-light/20" : "bg-white"
       )}
       onClick={handleStoreSemesterId}
@@ -139,18 +147,21 @@ const SemesterCard = ({
         {semesterDesc}
       </div>
 
-      <div className="flex justify-end gap-5 mt-5 min-w-[200px]">
-        {/* <Button variant="primary" onClick={handleStoreSemesterId}>
-          <Eye className="h-5 w-5 mr-2" />
-          <p>CHECK</p>
-        </Button> */}
-
+      <div className="flex justify-end mt-4 min-w-[200px]">
         <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogTrigger asChild>
-            <Button variant="primary">
-              <Pencil className="h-5 w-5 mr-2" />
-              <p>EDIT</p>
-            </Button>
+          <DialogTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="primaryOutline">
+                    <Pencil className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Edit</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <Form {...form}>
@@ -190,12 +201,7 @@ const SemesterCard = ({
                           </FormItem>
                         )}
                       />
-                      {/* <Input
-                        type="text"
-                        placeholder="Semester one ..."
-                        className="focus:border-1 focus:border-info"
-                        onChange={(e) => setNewSemesterName(e.target.value)}
-                      /> */}
+
                       <FormField
                         control={form.control}
                         name="semesterDesc"
@@ -234,11 +240,19 @@ const SemesterCard = ({
         </Dialog>
 
         <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-          <DialogTrigger asChild>
-            <Button variant="mars">
-              <Trash2 className="h-5 w-5 mr-2" />
-              <p>DELETE</p>
-            </Button>
+          <DialogTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="marsOutline" className="m-0">
+                    <Trash2 className="h-5 w-5 " />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -252,7 +266,7 @@ const SemesterCard = ({
                     className="group-hover:animate-spin"
                   />
                   <p className="text-black font-semibold">
-                    Are you sure you want to delete?
+                    Are you sure you want to delete this semester card?
                   </p>
                 </div>
               </DialogDescription>

@@ -15,6 +15,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -125,29 +131,39 @@ const AssignmentCard = ({
   };
 
   return (
-    <div className="border-[1px] border-info/30 rounded-md p-4 bg-muted w-[300px] mb-3">
+    <div className="border-[1px] border-info/30 rounded-md p-4 bg-muted w-[300px] mb-2">
       <p className="font-bold uppercase">{assignment.assignmentName}</p>
       <div className="mt-4">
         <div className="flex items-center justify-between">
-          <p className="">weight:</p>
-          <p className="text-sm">{assignment.weight}</p>
+          <p className="">Weight(%):</p>
+          <p className="text-sm">{assignment.weight}%</p>
         </div>
         <div className="flex items-center justify-between">
-          <p>full mark:</p>
+          <p>Full mark:</p>
           <p className="text-sm">{assignment.fullMark}</p>
         </div>
         <div className="flex items-center justify-between">
-          <p>scored:</p>
-          <p className="text-sm">{assignment.scored}</p>
+          <p>Scored:</p>
+          <p className="text-sm">
+            <span className="">{assignment.scored}</span>/{assignment.fullMark}
+          </p>
         </div>
       </div>
-      <div className="flex mt-4 gap-2 justify-end">
+      <div className="flex mt-4 justify-end">
         <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogTrigger asChild>
-            <Button variant="primary">
-              <Pencil className="h-5 w-5 mr-2" />
-              <p>EDIT</p>
-            </Button>
+          <DialogTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="primaryOutline">
+                    <Pencil className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Edit</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <Form {...assignmentForm}>
@@ -275,11 +291,19 @@ const AssignmentCard = ({
           </DialogContent>
         </Dialog>
         <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-          <DialogTrigger asChild>
-            <Button variant="mars">
-              <Trash2 className="h-5 w-5 mr-2" />
-              <p>DELETE</p>
-            </Button>
+          <DialogTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="marsOutline" className="m-0">
+                    <Trash2 className="h-5 w-5 " />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -293,7 +317,7 @@ const AssignmentCard = ({
                     className="group-hover:animate-spin"
                   />
                   <p className="text-black font-semibold">
-                    Are you sure you want to delete?
+                    Are you sure you want to delete this assignment card?
                   </p>
                 </div>
               </DialogDescription>

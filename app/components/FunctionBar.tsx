@@ -18,7 +18,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Pencil, FilePlus, Trash2, FileChartLine } from "lucide-react";
 import { useState } from "react";
 import { deleteCourses, updateCourse } from "@/app/actions/courseAction";
 import { createAssignment } from "@/app/actions/assignmentAction";
@@ -31,6 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type CourseFormData = z.infer<typeof courseSchema>;
 type AssignmentFormData = z.infer<typeof assignmentSchema>;
+type PredictionFormData = z.infer<typeof predictionSchema>;
 
 const courseSchema = z.object({
   courseName: z
@@ -68,6 +75,19 @@ const assignmentSchema = z
     }
   });
 
+const predictionSchema = z.object({
+  assignmentName: z
+    .string()
+    .min(3, { message: "Semester name must be at least 3 characters" })
+    .max(30, { message: "Semester name cannot exceed 30 characters" }),
+  weight: z.number().refine((val) => val >= 1 && val <= 100, {
+    message: "Passing line must be between 1 and 100.",
+  }),
+  fullMark: z.number().refine((val) => val >= 1 && val <= 500, {
+    message: "Passing line must be between 1 and 500.",
+  }),
+});
+
 type FunctionBarProps = {
   courseName: string | undefined;
   passingLine: number | undefined;
@@ -92,6 +112,7 @@ const FunctionBar = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPredictionModalOpen, setIsPredictionModalOpen] = useState(false);
 
   const courseForm = useForm<z.infer<typeof courseSchema>>({
     resolver: zodResolver(courseSchema),
@@ -108,6 +129,15 @@ const FunctionBar = ({
       weight: undefined,
       fullMark: undefined,
       scored: undefined,
+    },
+  });
+
+  const predictionForm = useForm<z.infer<typeof predictionSchema>>({
+    resolver: zodResolver(predictionSchema),
+    defaultValues: {
+      assignmentName: "",
+      weight: undefined,
+      fullMark: undefined,
     },
   });
 
@@ -161,15 +191,47 @@ const FunctionBar = ({
     }
   }
 
+  async function handlePredictionSubmit(
+    values: z.infer<typeof predictionSchema>
+  ) {
+    //   setLoading(true);
+    //   try {
+    //     await createAssignment(
+    //       values.assignmentName,
+    //       values.weight,
+    //       values.fullMark,
+    //       values.scored,
+    //       course_Id
+    //     );
+    //     setRefetchTrigger(!refetchTrigger);
+    //     setIsPredictionModalOpen(false);
+    //     toast({
+    //       title: "Create assignment card success!",
+    //     });
+    //   } catch (error) {
+    //     console.error("Error creating card:", error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+  }
+
   return (
-    <div className="flex ml-2 mr-2.5 gap-5 items-center">
+    <div className="flex ml-2 mr-2.5 items-center">
       {/* edit a course */}
       <Dialog open={isEditModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogTrigger asChild>
-          <Button variant="primary">
-            <Pencil className="h-5 w-5 mr-2" />
-            <p>EDIT</p>
-          </Button>
+        <DialogTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="primaryOutline">
+                  <Pencil className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit Course</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <Form {...courseForm}>
@@ -248,14 +310,21 @@ const FunctionBar = ({
           </Form>
         </DialogContent>
       </Dialog>
-
       {/* delete a course */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogTrigger asChild>
-          <Button variant="mars">
-            <Trash2 className="h-5 w-5 mr-2" />
-            <p>DELETE</p>
-          </Button>
+        <DialogTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="primaryOutline" className="m-0">
+                  <Trash2 className="h-5 w-5 " />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Delete Course</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -269,7 +338,7 @@ const FunctionBar = ({
                   className="group-hover:animate-spin"
                 />
                 <p className="text-black font-semibold">
-                  Are you sure you want to delete?
+                  Are you sure you want to delete this course card?
                 </p>
               </div>
             </DialogDescription>
@@ -285,12 +354,22 @@ const FunctionBar = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <div className=" bg-slate-300 w-[1px] h-6 mx-4" />
       {/* create a assignment */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button variant="secondary">
-            <Plus className="w-6 h-6 mr-2" /> <p>ASSIGNMENT</p>
-          </Button>
+        <DialogTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="primaryOutline">
+                  <FilePlus className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Create Assignment</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <Form {...assignmentForm}>
@@ -409,6 +488,129 @@ const FunctionBar = ({
                 </Button>
                 <Button type="submit" variant="secondary">
                   Create
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      <div className=" bg-slate-300 w-[1px] h-6 mx-4" />
+      {/* prediction form  */}
+      <Dialog
+        open={isPredictionModalOpen}
+        onOpenChange={setIsPredictionModalOpen}
+      >
+        <DialogTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="primaryOutline">
+                  <FileChartLine className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Prediction</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <Form {...predictionForm}>
+            <form
+              onSubmit={predictionForm.handleSubmit(handlePredictionSubmit)}
+              className="space-y-8"
+            >
+              <DialogHeader>
+                <DialogDescription>
+                  <div className="flex flex-col items-center gap-5">
+                    <Image
+                      src="/create_confirm.png"
+                      height={60}
+                      width={60}
+                      alt="planets"
+                      className="group-hover:animate-spin"
+                    />
+                    <p className="text-black font-semibold">
+                      You can predict the exam score to acheive your goal
+                    </p>
+                    <FormField
+                      control={predictionForm.control}
+                      name="assignmentName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Assignment Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="e.g. Technical report ..."
+                              autoComplete="off"
+                              className="focus:border-1 focus:border-info w-[300px] h-[50px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={predictionForm.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Weight</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Assignment weight, e.g. 25"
+                              autoComplete="off"
+                              className="focus:border-1 focus:border-leaf w-[300px] h-[50px]"
+                              {...field}
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(parseInt(e.target.value));
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={predictionForm.control}
+                      name="fullMark"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full mark</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="Assignment full mark, e.g. 100"
+                              autoComplete="off"
+                              className="focus:border-1 focus:border-leaf w-[300px] h-[50px]"
+                              {...field}
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(parseInt(e.target.value));
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter>
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsPredictionModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" variant="secondary">
+                  Predict
                 </Button>
               </DialogFooter>
             </form>

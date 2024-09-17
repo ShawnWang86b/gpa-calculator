@@ -1,6 +1,6 @@
 "use client";
 
-import { assignments, courses } from "@/db/schema";
+import { courses } from "@/db/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import useStore from "@/app/store/useStore";
@@ -8,6 +8,7 @@ import Image from "next/image";
 import { getAssignments } from "../actions/assignmentAction";
 import AssignmentCard from "@/app/components/AssignmentCard";
 import FunctionBar from "@/app/components/FunctionBar";
+import { FilePlus } from "lucide-react";
 
 type Props = {
   courses: Array<typeof courses.$inferSelect>;
@@ -42,6 +43,9 @@ const CourseTabs = ({
   const [refetchTrigger, setRefetchTrigger] = useState(false);
   const [assignmentRefetchTrigger, setAssignmentRefetchTrigger] =
     useState(false);
+  const [assignmentCounts, setAssignmentCounts] = useState<
+    Record<number, number>
+  >({});
 
   useEffect(() => {
     if (courses.length > 0 && !currentValue) {
@@ -77,10 +81,27 @@ const CourseTabs = ({
     }
   }, [currentValue, courses, refetchTrigger, assignmentRefetchTrigger]);
 
+  const handleAssignmentNumber = async (course_id: number) => {
+    const result = await getAssignments(course_id);
+    const length = result.length;
+    setAssignmentCounts((prev) => ({
+      ...prev,
+      [course_id]: length,
+    }));
+  };
+
+  useEffect(() => {
+    // Trigger initial loading for all courses (optional)
+    courses.forEach((course) => {
+      handleAssignmentNumber(course.id);
+    });
+    setAssignmentRefetchTrigger(assignmentRefetchTrigger);
+  }, [courses, assignmentRefetchTrigger]);
+
   return (
     <Tabs defaultValue={courses[0].id?.toString()} className="h-screen">
-      <TabsList className="mt-5 mb-3">
-        {courses.map((course: any) => (
+      <TabsList className="mt-9 mb-5 ml-5">
+        {courses.map((course: Course) => (
           <>
             <TabsTrigger
               value={course.id.toString()}
@@ -94,7 +115,7 @@ const CourseTabs = ({
                   Passing line: {course.passingLine}%
                 </div>
                 <div className="text-xs">
-                  Courses number: {assignments?.length || 0}
+                  Courses number: {assignmentCounts[course.id] ?? "Loading..."}
                 </div>
               </div>
             </TabsTrigger>
@@ -128,8 +149,9 @@ const CourseTabs = ({
                 <p className=" text-black font-semibold mt-2">
                   No assignment founded!
                 </p>
-                <p className="text-sm text-muted-foreground font-semibold mt-2">
-                  Hit the new assignment button to create a new assignment card.
+                <p className="text-sm text-muted-foreground font-semibold mt-2 inline-flex">
+                  Hit the <FilePlus className="mx-2" /> button to create a new
+                  assignment card.
                 </p>
               </div>
             </>
@@ -145,8 +167,8 @@ const CourseTabs = ({
                   setCreateSuccessTrigger={setCreateSuccessTrigger}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-3 bg-slate-100">
-                {assignments?.map((assignment: any) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-5 bg-slate-100">
+                {assignments?.map((assignment: Assignment) => (
                   <div key={assignment.id}>
                     <AssignmentCard
                       assignment={assignment}

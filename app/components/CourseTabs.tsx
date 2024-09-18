@@ -73,6 +73,7 @@ const CourseTabs = ({
             const result = await getAssignments(Number(courseId));
             //@ts-ignore
             setAssignments(result);
+            //@ts-ignore
             setAssingmentValue(result);
           } catch (error) {
             console.error("Error fetching assignments:", error);

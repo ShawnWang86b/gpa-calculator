@@ -1,5 +1,22 @@
 import { create } from "zustand";
 
+type Assignment = {
+  assignmentName: string;
+  courseId: number;
+  fullMark: number;
+  hurdle: number;
+  id: number;
+  scored: number;
+  weight: number;
+};
+
+type PredictValue = {
+  userName: string;
+  requireScore: number;
+  assignmentName: string;
+  assignmentTargetScore: number;
+};
+
 interface CalculatorState {
   reset: () => void;
   selectedSemesterId: string;
@@ -8,18 +25,18 @@ interface CalculatorState {
   currentValue: number;
   setCurrentValue: (courseName: number) => void;
 
-  predictionValue: any;
-  setPredictionValue: (values: any) => void;
+  predictionValue: PredictValue;
+  setPredictionValue: (values: PredictValue) => void;
 
-  assignmentsValue: any;
-  setAssignmentValue: (values: any) => void;
+  assignmentsValue: Assignment[];
+  setAssignmentValue: (values: Assignment[]) => void;
 }
 
 const initialState = {
   selectedSemesterId: "",
   currentValue: 0,
-  predictionValue: {},
-  assignmentsValue: [],
+  predictionValue: {} as PredictValue,
+  assignmentsValue: [] as Assignment[],
 };
 
 const useStore = create<CalculatorState>((set) => ({
@@ -29,8 +46,9 @@ const useStore = create<CalculatorState>((set) => ({
     set(() => ({ selectedSemesterId: semesterId })),
   setCurrentValue: (courseId: number) =>
     set(() => ({ currentValue: courseId })),
-  setPredictionValue: (values: any) => set(() => ({ predictionValue: values })),
-  setAssignmentValue: (values: any) =>
+  setPredictionValue: (values: PredictValue) =>
+    set(() => ({ predictionValue: values })),
+  setAssignmentValue: (values: Assignment[]) =>
     set(() => ({ assignmentsValue: values })),
 }));
 

@@ -58,7 +58,7 @@ const assignmentSchema = z
       .min(3, { message: "Semester name must be at least 3 characters" })
       .max(30, { message: "Semester name cannot exceed 30 characters" }),
     weight: z.number().refine((val) => val >= 1 && val <= 100, {
-      message: "Passing line must be between 1 and 100.",
+      message: `Weight must be between 1 and 100`,
     }),
     fullMark: z.number().refine((val) => val >= 1 && val <= 500, {
       message: "Passing line must be between 1 and 500.",
@@ -70,8 +70,8 @@ const assignmentSchema = z
       .number()
       .optional()
       .default(50)
-      .refine((val) => val >= 1 && val <= 100, {
-        message: "Hurdle must be between 1 and 100.",
+      .refine((val) => val >= 0 && val <= 100, {
+        message: "Hurdle must be between 0 and 100.",
       }),
   })
   .superRefine((data, ctx) => {
@@ -94,6 +94,7 @@ const AssignmentCard = ({
 
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const assignmentForm = useForm<z.infer<typeof assignmentSchema>>({
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
@@ -296,7 +297,7 @@ const AssignmentCard = ({
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" variant="primary">
+                  <Button type="submit" variant="primary" disabled={loading}>
                     Submit
                   </Button>
                 </DialogFooter>

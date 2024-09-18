@@ -37,10 +37,11 @@ import { useToast } from "@/hooks/use-toast";
 import { evaluateAssignments } from "../utils/evaluateAssignments";
 import { getFinalAssignmentWeight } from "../utils/getFinalAssignmentWeight";
 import { useRouter } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
 import { useUser } from "@clerk/nextjs";
+import { getCurrentTotalWeight } from "../utils/currentTotalWeight";
 
 type CourseFormData = z.infer<typeof courseSchema>;
+// @ts-ignore
 type AssignmentFormData = z.infer<typeof assignmentSchema>;
 type PredictionFormData = z.infer<typeof predictionSchema>;
 
@@ -50,42 +51,45 @@ const courseSchema = z.object({
     .min(3, { message: "Semester name must be at least 3 characters" })
     .max(30, { message: "Semester name cannot exceed 30 characters" }),
   passingLine: z.number().refine((val) => val >= 1 && val <= 100, {
-    message: "Passing line must be between 1 and 100.",
+    message: "Weight must be between 1 and 100",
   }),
 });
 
-const assignmentSchema = z
-  .object({
-    assignmentName: z
-      .string()
-      .min(3, { message: "Semester name must be at least 3 characters" })
-      .max(30, { message: "Semester name cannot exceed 30 characters" }),
-    weight: z.number().refine((val) => val >= 1 && val <= 100, {
-      message: "Passing line must be between 1 and 100.",
-    }),
-    fullMark: z.number().refine((val) => val >= 1 && val <= 500, {
-      message: "Passing line must be between 1 and 500.",
-    }),
-    scored: z.number().refine((val) => val >= 1 && val <= 500, {
-      message: "Scored mark must be between 1 and 500.",
-    }),
-    hurdle: z
-      .number()
-      .optional()
-      .default(50)
-      .refine((val) => val >= 1 && val <= 100, {
-        message: "Hurdle must be between 1 and 100.",
+const createAssignmentSchema = (currentWeight: number) =>
+  z
+    .object({
+      assignmentName: z
+        .string()
+        .min(3, { message: "Semester name must be at least 3 characters" })
+        .max(30, { message: "Semester name cannot exceed 30 characters" }),
+      weight: z
+        .number()
+        .refine((val) => val >= 1 && val <= 100 - currentWeight, {
+          message: `Weight must be between 1 and ${100 - currentWeight}`,
+        }),
+      fullMark: z.number().refine((val) => val >= 1 && val <= 500, {
+        message: "Passing line must be between 1 and 500.",
       }),
-  })
-  .superRefine((data, ctx) => {
-    if (data.scored > data.fullMark) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["scored"],
-        message: "Scored mark cannot exceed the full mark.",
-      });
-    }
-  });
+      scored: z.number().refine((val) => val >= 1 && val <= 500, {
+        message: "Scored mark must be between 1 and 500.",
+      }),
+      hurdle: z
+        .number()
+        .optional()
+        .default(50)
+        .refine((val) => val >= 0 && val <= 100, {
+          message: "Hurdle must be between 0 and 100.",
+        }),
+    })
+    .superRefine((data, ctx) => {
+      if (data.scored > data.fullMark) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["scored"],
+          message: "Scored mark cannot exceed the full mark.",
+        });
+      }
+    });
 
 const predictionSchema = z.object({
   assignmentName: z
@@ -102,7 +106,7 @@ const predictionSchema = z.object({
     .number()
     .optional()
     .default(50)
-    .refine((val) => val >= 1 && val <= 100, {
+    .refine((val) => val >= 0 && val <= 100, {
       message: "Hurdle must be between 1 and 100.",
     }),
 });
@@ -124,14 +128,19 @@ const FunctionBar = ({
   createSuccessTrigger,
   setCreateSuccessTrigger,
 }: FunctionBarProps) => {
+  // Get logged user name
   const { user } = useUser();
   const userName = user?.username || `${user?.firstName}`;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
   const course_Id = useStore((state) => state.currentValue);
   const assignments = useStore((state) => state.assignmentsValue);
   const setPredictScore = useStore((state) => state.setPredictionValue);
+
+  const [currentWeight, setCurrentWeight] = useState<number>(0);
+  // Open and close edit, delete , create assignment and prediction modal.
   const [isOpen, setIsOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -146,6 +155,7 @@ const FunctionBar = ({
       passingLine: passingLine,
     },
   });
+  const assignmentSchema = createAssignmentSchema(currentWeight);
 
   const assignmentForm = useForm<z.infer<typeof assignmentSchema>>({
     resolver: zodResolver(assignmentSchema),
@@ -167,12 +177,12 @@ const FunctionBar = ({
       targetScore: 50,
     },
   });
-  const { reset, watch } = predictionForm;
+  const { reset } = predictionForm;
 
+  // Here is auto generate and refresh the prediction final weight when user trigger predict function
   useEffect(() => {
     if (assignments && assignments.length > 0) {
       const finalWeight = getFinalAssignmentWeight(assignments);
-      console.log("finalWeight", finalWeight);
       setDefaultWeight(finalWeight);
 
       reset({
@@ -184,14 +194,21 @@ const FunctionBar = ({
     }
   }, [assignments, reset]);
 
+  // Get current weight sum for all assignment in one course, make sure weight not over 100
+  useEffect(() => {
+    const newTotalWeight = getCurrentTotalWeight(assignments);
+    console.log("newTotalWeight", newTotalWeight);
+    setCurrentWeight(newTotalWeight);
+  }, [assignments]);
+
   async function handleCourseSubmit(values: z.infer<typeof courseSchema>) {
     setLoading(true);
     try {
       await updateCourse(course_Id, values.courseName, values.passingLine);
       setCreateSuccessTrigger(!createSuccessTrigger);
-      setIsOpen(false);
+      setEditModalOpen(false);
       toast({
-        title: "Create course card success!",
+        title: "Update course card success!",
       });
     } catch (error) {
       console.error("Error creating card:", error);
@@ -633,6 +650,7 @@ const FunctionBar = ({
                           <FormLabel>Weight</FormLabel>
                           <FormControl>
                             <Input
+                              disabled
                               type="number"
                               placeholder="Assignment weight, e.g. 25"
                               autoComplete="off"
@@ -706,7 +724,7 @@ const FunctionBar = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" variant="secondary">
+                <Button type="submit" variant="secondary" disabled={loading}>
                   Predict
                 </Button>
               </DialogFooter>

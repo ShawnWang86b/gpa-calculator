@@ -181,17 +181,19 @@ const FunctionBar = ({
 
   // Here is auto generate and refresh the prediction final weight when user trigger predict function
   useEffect(() => {
-    if (assignments && assignments.length > 0) {
-      const finalWeight = getFinalAssignmentWeight(assignments);
-      setDefaultWeight(finalWeight);
+    const defaultWeight =
+      assignments && assignments.length > 0
+        ? getFinalAssignmentWeight(assignments)
+        : 100;
 
-      reset({
-        assignmentName: "",
-        weight: finalWeight,
-        hurdle: 50,
-        targetScore: 50,
-      });
-    }
+    setDefaultWeight(defaultWeight);
+
+    reset({
+      assignmentName: "",
+      weight: defaultWeight,
+      hurdle: 50,
+      targetScore: 50,
+    });
   }, [assignments, reset]);
 
   // Get current weight sum for all assignment in one course, make sure weight not over 100

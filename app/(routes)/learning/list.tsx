@@ -26,7 +26,7 @@ export const List = ({ semesters }: Semesters) => {
   setSelectedSemesterId(defaultSemesterId);
 
   return (
-    <div className="h-[800px] scroll-container">
+    <div className="h-screen scroll-container">
       {semesters.map((semester: Semester) => (
         <SemesterCard
           key={semester.id}
